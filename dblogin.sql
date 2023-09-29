@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Servidor: localhost:3306
--- Tiempo de generación: 27-09-2023 a las 15:11:10
--- Versión del servidor: 8.0.30
--- Versión de PHP: 8.1.10
+-- Host: localhost:3306
+-- Generation Time: Sep 29, 2023 at 01:41 AM
+-- Server version: 8.0.30
+-- PHP Version: 8.1.10
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,13 +18,35 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `dblogin`
+-- Database: `dblogin`
 --
+
+DELIMITER $$
+--
+-- Procedures
+--
+CREATE DEFINER=`root`@`localhost` PROCEDURE `insertUser` (IN `personName` VARCHAR(50), IN `personLName` VARCHAR(80), IN `personEmail` VARCHAR(150), IN `personPhone` VARCHAR(20), IN `userTypeId` INT, IN `cveUser` VARCHAR(20), IN `departament` VARCHAR(50), IN `groupStdnt` VARCHAR(20), IN `career` VARCHAR(100), IN `dependence` VARCHAR(200))   BEGIN
+    DECLARE personId INT;
+
+    -- Insertar en la tabla catpersons
+    INSERT INTO catpersons (personName, personLName, personEmail, personPhone, dtCreatedAt)
+    VALUES (personName, personLName, personEmail, personPhone, NOW());
+
+    -- Obtener el ID generado para catpersons
+    SET personId = LAST_INSERT_ID();
+
+    -- Insertar en la tabla catusers
+    INSERT INTO catusers (fk_personId, fk_UserTypeId, cveUser, userPass, departament, groupStdnt, career, dependence, dtCreatedAt)
+    VALUES (personId, userTypeId, cveUser, MD5(cveUser), departament, groupStdnt, career, dependence, NOW());
+
+END$$
+
+DELIMITER ;
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `autores`
+-- Table structure for table `autores`
 --
 
 CREATE TABLE `autores` (
@@ -35,7 +57,7 @@ CREATE TABLE `autores` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `catpersons`
+-- Table structure for table `catpersons`
 --
 
 CREATE TABLE `catpersons` (
@@ -44,12 +66,12 @@ CREATE TABLE `catpersons` (
   `personLName` varchar(80) DEFAULT NULL,
   `personEmail` varchar(150) NOT NULL,
   `personPhone` varchar(20) NOT NULL,
-  `dtCreatedAt` datetime DEFAULT NULL,
+  `dtCreatedAt` datetime DEFAULT CURRENT_TIMESTAMP,
   `bActive` bit(1) DEFAULT b'1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Volcado de datos para la tabla `catpersons`
+-- Dumping data for table `catpersons`
 --
 
 INSERT INTO `catpersons` (`personId`, `personName`, `personLName`, `personEmail`, `personPhone`, `dtCreatedAt`, `bActive`) VALUES
@@ -58,12 +80,16 @@ INSERT INTO `catpersons` (`personId`, `personName`, `personLName`, `personEmail`
 (3, 'Director', 'Carrera TI', 'direccion-ti@utem.edu.mx', '3140000003', '2023-05-24 13:55:39', b'1'),
 (4, 'Docente', 'TI', 'docente-ti@utem.edu.mx', '3140000004', '2023-05-24 13:55:39', b'1'),
 (5, 'Alumno', 'Pruebas1', 'a20230001@utem.edu.mx', '3140000005', '2023-05-24 13:55:39', b'1'),
-(6, 'Externo', 'CETis', 'laboratorios_ti@utem.edu.mx', '3140000006', '2023-05-24 13:55:39', b'1');
+(6, 'Externo', 'CETis', 'laboratorios_ti@utem.edu.mx', '3140000006', '2023-05-24 13:55:39', b'1'),
+(7, 'Juan', 'Fernandez', 'iscjuanmafa@gmail.com', '3122100436', '2023-09-28 13:02:04', b'1'),
+(8, 'Juan Manuel', 'Fernández Alvarez', 'manuel-fernandez@utem.edu.mx', '3122100436', '2023-09-28 13:14:27', b'1'),
+(9, 'Pedro', 'Gonzalez', 'pedro_gon@algo.comn', '1234567890', '2023-09-28 13:18:57', b'1'),
+(10, 'Damian', 'Hernandez', 'dam@algo.com', '3142345678', '2023-09-28 13:26:01', b'1');
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `catusers`
+-- Table structure for table `catusers`
 --
 
 CREATE TABLE `catusers` (
@@ -81,7 +107,7 @@ CREATE TABLE `catusers` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Volcado de datos para la tabla `catusers`
+-- Dumping data for table `catusers`
 --
 
 INSERT INTO `catusers` (`userId`, `fk_personId`, `fk_UserTypeId`, `cveUser`, `userPass`, `departament`, `groupStdnt`, `career`, `dependence`, `dtCreatedAt`, `bActive`) VALUES
@@ -91,12 +117,16 @@ INSERT INTO `catusers` (`userId`, `fk_personId`, `fk_UserTypeId`, `cveUser`, `us
 (5, 4, 4, 'PTC180399', 'docente2023', 'Dirección Académica', '', 'ING en TI', '', '2023-05-24 14:00:39', b'1'),
 (6, 5, 5, 'AL20230001', 'alumno2023', 'Escolares/Académico', '3TID1', 'TSU en TI', '', '2023-05-24 14:00:39', b'1'),
 (7, 6, 6, 'EX20230001', 'externo2023', '', '', '', 'CEtis', '2023-05-24 14:00:39', b'1'),
-(8, 1, 3, 'user2023', '07215ef5d2943dad30887d55e0cc3074', 'Sociales', '3TID2', 'TIC', 'UTEM', '2023-06-07 09:55:00', b'1');
+(8, 1, 3, 'user2023', '07215ef5d2943dad30887d55e0cc3074', 'Sociales', '3TID2', 'TIC', 'UTEM', '2023-06-07 09:55:00', b'1'),
+(9, 7, 1, 'FEJU2309', '23f9378b21fc2837a62e0e0ed025e689', 'acad', '1TID1', 'TSU en TI', 'UTeM', '2023-09-28 13:02:04', b'1'),
+(10, 8, 4, 'FEJU2309', '23f9378b21fc2837a62e0e0ed025e689', 'Académico', '1TID1', 'TSU en TI', 'UTeM', '2023-09-28 13:14:27', b'1'),
+(11, 9, 6, 'GOPE2309', 'f955f90118e99d8ce5585095a43d2fa9', 'Recursos Humanos', 'NA', 'NA', 'ASIPONA', '2023-09-28 13:18:57', b'1'),
+(12, 10, 3, 'HEDA2309', 'b8e448e111fb659c1cee7c2625505ed5', 'Escolares', 'NA', 'NA', 'UTeM', '2023-09-28 13:26:01', b'1');
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `catusertypes`
+-- Table structure for table `catusertypes`
 --
 
 CREATE TABLE `catusertypes` (
@@ -107,7 +137,7 @@ CREATE TABLE `catusertypes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Volcado de datos para la tabla `catusertypes`
+-- Dumping data for table `catusertypes`
 --
 
 INSERT INTO `catusertypes` (`userTypeId`, `userType`, `typeDesc`, `dtCreatedAt`) VALUES
@@ -121,7 +151,7 @@ INSERT INTO `catusertypes` (`userTypeId`, `userType`, `typeDesc`, `dtCreatedAt`)
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `ejemplares`
+-- Table structure for table `ejemplares`
 --
 
 CREATE TABLE `ejemplares` (
@@ -143,7 +173,7 @@ CREATE TABLE `ejemplares` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `libroautor`
+-- Table structure for table `libroautor`
 --
 
 CREATE TABLE `libroautor` (
@@ -155,7 +185,7 @@ CREATE TABLE `libroautor` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `libros`
+-- Table structure for table `libros`
 --
 
 CREATE TABLE `libros` (
@@ -167,7 +197,7 @@ CREATE TABLE `libros` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `sessions`
+-- Table structure for table `sessions`
 --
 
 CREATE TABLE `sessions` (
@@ -182,169 +212,169 @@ CREATE TABLE `sessions` (
 -- --------------------------------------------------------
 
 --
--- Estructura Stand-in para la vista `usersactive`
--- (Véase abajo para la vista actual)
+-- Stand-in structure for view `usersactive`
+-- (See below for the actual view)
 --
 CREATE TABLE `usersactive` (
-`Pass` varchar(50)
-,`uId` int
+`uId` int
 ,`userCode` varchar(20)
+,`Pass` varchar(50)
 ,`UserType` int
 );
 
 -- --------------------------------------------------------
 
 --
--- Estructura Stand-in para la vista `vwadministrativos`
--- (Véase abajo para la vista actual)
+-- Stand-in structure for view `vwadministrativos`
+-- (See below for the actual view)
 --
 CREATE TABLE `vwadministrativos` (
-`Apellidos_Admin` varchar(80)
-,`Departamento_Area` varchar(50)
-,`Email_Admin` varchar(150)
-,`Nombre_Admin` varchar(50)
-,`Nombre_Completo_Admin` varchar(131)
+`user_id` int
 ,`NumTrab` varchar(20)
-,`Telefono_Admin` varchar(20)
-,`typeDesc` varchar(200)
-,`user_id` int
+,`Departamento_Area` varchar(50)
 ,`userActive` bit(1)
-,`userType` varchar(50)
+,`Nombre_Admin` varchar(50)
+,`Apellidos_Admin` varchar(80)
+,`Nombre_Completo_Admin` varchar(131)
+,`Email_Admin` varchar(150)
+,`Telefono_Admin` varchar(20)
 ,`userTypeId` int
+,`userType` varchar(50)
+,`typeDesc` varchar(200)
 );
 
 -- --------------------------------------------------------
 
 --
--- Estructura Stand-in para la vista `vwadmins`
--- (Véase abajo para la vista actual)
+-- Stand-in structure for view `vwadmins`
+-- (See below for the actual view)
 --
 CREATE TABLE `vwadmins` (
-`departament` varchar(50)
-,`email` varchar(150)
+`user_id` int
+,`user_code` varchar(20)
+,`departament` varchar(50)
+,`userActive` bit(1)
 ,`first_name` varchar(50)
 ,`last_name` varchar(80)
+,`email` varchar(150)
 ,`phone` varchar(20)
-,`typeDesc` varchar(200)
-,`user_code` varchar(20)
-,`user_id` int
-,`userActive` bit(1)
-,`userType` varchar(50)
 ,`userTypeId` int
+,`userType` varchar(50)
+,`typeDesc` varchar(200)
 );
 
 -- --------------------------------------------------------
 
 --
--- Estructura Stand-in para la vista `vwallusersdata`
--- (Véase abajo para la vista actual)
+-- Stand-in structure for view `vwallusersdata`
+-- (See below for the actual view)
 --
 CREATE TABLE `vwallusersdata` (
-`career` varchar(100)
+`user_id` int
+,`user_code` varchar(20)
 ,`departament` varchar(50)
+,`std_group` varchar(20)
+,`career` varchar(100)
 ,`dependence` varchar(200)
-,`email` varchar(150)
+,`userActive` bit(1)
 ,`first_name` varchar(50)
 ,`last_name` varchar(80)
+,`email` varchar(150)
 ,`phone` varchar(20)
-,`std_group` varchar(20)
-,`typeDesc` varchar(200)
-,`user_code` varchar(20)
-,`user_id` int
-,`userActive` bit(1)
-,`userType` varchar(50)
 ,`userTypeId` int
+,`userType` varchar(50)
+,`typeDesc` varchar(200)
 );
 
 -- --------------------------------------------------------
 
 --
--- Estructura Stand-in para la vista `vwalumnos`
--- (Véase abajo para la vista actual)
+-- Stand-in structure for view `vwalumnos`
+-- (See below for the actual view)
 --
 CREATE TABLE `vwalumnos` (
-`Apellidos_Alumno` varchar(80)
-,`Carrera` varchar(100)
-,`Email_Alumno` varchar(150)
-,`Grupo` varchar(20)
-,`Nombre_Alumno` varchar(50)
-,`Nombre_Completo_Alumno` varchar(131)
+`user_id` int
 ,`NumCtrl` varchar(20)
-,`Telefono_Alumno` varchar(20)
-,`typeDesc` varchar(200)
-,`user_id` int
+,`Grupo` varchar(20)
+,`Carrera` varchar(100)
 ,`userActive` bit(1)
-,`userType` varchar(50)
+,`Nombre_Alumno` varchar(50)
+,`Apellidos_Alumno` varchar(80)
+,`Nombre_Completo_Alumno` varchar(131)
+,`Email_Alumno` varchar(150)
+,`Telefono_Alumno` varchar(20)
 ,`userTypeId` int
+,`userType` varchar(50)
+,`typeDesc` varchar(200)
 );
 
 -- --------------------------------------------------------
 
 --
--- Estructura Stand-in para la vista `vwdocente`
--- (Véase abajo para la vista actual)
+-- Stand-in structure for view `vwdocente`
+-- (See below for the actual view)
 --
 CREATE TABLE `vwdocente` (
-`Apellidos_Docente` varchar(80)
-,`Carrera` varchar(100)
-,`Departamento_Area` varchar(50)
-,`Email_Docente` varchar(150)
-,`Nombre_Completo_Docente` varchar(131)
-,`Nombre_Docente` varchar(50)
+`user_id` int
 ,`NumTrab` varchar(20)
-,`Telefono_Docente` varchar(20)
-,`typeDesc` varchar(200)
-,`user_id` int
+,`Departamento_Area` varchar(50)
+,`Carrera` varchar(100)
 ,`userActive` bit(1)
-,`userType` varchar(50)
+,`Nombre_Docente` varchar(50)
+,`Apellidos_Docente` varchar(80)
+,`Nombre_Completo_Docente` varchar(131)
+,`Email_Docente` varchar(150)
+,`Telefono_Docente` varchar(20)
 ,`userTypeId` int
+,`userType` varchar(50)
+,`typeDesc` varchar(200)
 );
 
 -- --------------------------------------------------------
 
 --
--- Estructura Stand-in para la vista `vwexternos`
--- (Véase abajo para la vista actual)
+-- Stand-in structure for view `vwexternos`
+-- (See below for the actual view)
 --
 CREATE TABLE `vwexternos` (
-`Apellidos_Externo` varchar(80)
+`user_id` int
 ,`cveExterno` varchar(20)
 ,`Dependencia` varchar(200)
-,`Email_Externo` varchar(150)
-,`Nombre_Completo_Externo` varchar(131)
-,`Nombre_Externo` varchar(50)
-,`Telefono_Externo` varchar(20)
-,`typeDesc` varchar(200)
-,`user_id` int
 ,`userActive` bit(1)
-,`userType` varchar(50)
+,`Nombre_Externo` varchar(50)
+,`Apellidos_Externo` varchar(80)
+,`Nombre_Completo_Externo` varchar(131)
+,`Email_Externo` varchar(150)
+,`Telefono_Externo` varchar(20)
 ,`userTypeId` int
+,`userType` varchar(50)
+,`typeDesc` varchar(200)
 );
 
 -- --------------------------------------------------------
 
 --
--- Estructura Stand-in para la vista `vwsessionsusers`
--- (Véase abajo para la vista actual)
+-- Stand-in structure for view `vwsessionsusers`
+-- (See below for the actual view)
 --
 CREATE TABLE `vwsessionsusers` (
-`cveSession` int
+`userId` int
 ,`cveUser` varchar(20)
+,`userTypeId` int
+,`userType` varchar(50)
+,`personId` int
+,`personName` varchar(50)
+,`personLName` varchar(80)
+,`sessionId` int
+,`cveSession` int
 ,`dtLogIn` datetime
 ,`dtLogOut` datetime
-,`personId` int
-,`personLName` varchar(80)
-,`personName` varchar(50)
-,`sessionId` int
-,`userId` int
-,`userType` varchar(50)
-,`userTypeId` int
 );
 
 -- --------------------------------------------------------
 
 --
--- Estructura para la vista `usersactive`
+-- Structure for view `usersactive`
 --
 DROP TABLE IF EXISTS `usersactive`;
 
@@ -353,7 +383,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 -- --------------------------------------------------------
 
 --
--- Estructura para la vista `vwadministrativos`
+-- Structure for view `vwadministrativos`
 --
 DROP TABLE IF EXISTS `vwadministrativos`;
 
@@ -362,7 +392,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 -- --------------------------------------------------------
 
 --
--- Estructura para la vista `vwadmins`
+-- Structure for view `vwadmins`
 --
 DROP TABLE IF EXISTS `vwadmins`;
 
@@ -371,7 +401,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 -- --------------------------------------------------------
 
 --
--- Estructura para la vista `vwallusersdata`
+-- Structure for view `vwallusersdata`
 --
 DROP TABLE IF EXISTS `vwallusersdata`;
 
@@ -380,7 +410,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 -- --------------------------------------------------------
 
 --
--- Estructura para la vista `vwalumnos`
+-- Structure for view `vwalumnos`
 --
 DROP TABLE IF EXISTS `vwalumnos`;
 
@@ -389,7 +419,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 -- --------------------------------------------------------
 
 --
--- Estructura para la vista `vwdocente`
+-- Structure for view `vwdocente`
 --
 DROP TABLE IF EXISTS `vwdocente`;
 
@@ -398,7 +428,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 -- --------------------------------------------------------
 
 --
--- Estructura para la vista `vwexternos`
+-- Structure for view `vwexternos`
 --
 DROP TABLE IF EXISTS `vwexternos`;
 
@@ -407,30 +437,30 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 -- --------------------------------------------------------
 
 --
--- Estructura para la vista `vwsessionsusers`
+-- Structure for view `vwsessionsusers`
 --
 DROP TABLE IF EXISTS `vwsessionsusers`;
 
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vwsessionsusers`  AS SELECT `u`.`userId` AS `userId`, `u`.`cveUser` AS `cveUser`, `t`.`userTypeId` AS `userTypeId`, `t`.`userType` AS `userType`, `p`.`personId` AS `personId`, `p`.`personName` AS `personName`, `p`.`personLName` AS `personLName`, `s`.`sessionId` AS `sessionId`, `s`.`cveSession` AS `cveSession`, `s`.`dtLogIn` AS `dtLogIn`, `s`.`dtLogOut` AS `dtLogOut` FROM (((`catusers` `u` join `catusertypes` `t` on((`u`.`fk_UserTypeId` = `t`.`userTypeId`))) join `catpersons` `p` on((`u`.`fk_personId` = `p`.`personId`))) join `sessions` `s` on((`s`.`fk_userId` = `u`.`userId`))) ;
 
 --
--- Índices para tablas volcadas
+-- Indexes for dumped tables
 --
 
 --
--- Indices de la tabla `autores`
+-- Indexes for table `autores`
 --
 ALTER TABLE `autores`
   ADD PRIMARY KEY (`eIdAutor`);
 
 --
--- Indices de la tabla `catpersons`
+-- Indexes for table `catpersons`
 --
 ALTER TABLE `catpersons`
   ADD PRIMARY KEY (`personId`);
 
 --
--- Indices de la tabla `catusers`
+-- Indexes for table `catusers`
 --
 ALTER TABLE `catusers`
   ADD PRIMARY KEY (`userId`),
@@ -438,91 +468,91 @@ ALTER TABLE `catusers`
   ADD KEY `fk_UserTypeId` (`fk_UserTypeId`);
 
 --
--- Indices de la tabla `catusertypes`
+-- Indexes for table `catusertypes`
 --
 ALTER TABLE `catusertypes`
   ADD PRIMARY KEY (`userTypeId`);
 
 --
--- Indices de la tabla `ejemplares`
+-- Indexes for table `ejemplares`
 --
 ALTER TABLE `ejemplares`
   ADD PRIMARY KEY (`eIdEjemplar`),
   ADD KEY `fkeIdLibro` (`fkeIdLibro`);
 
 --
--- Indices de la tabla `libroautor`
+-- Indexes for table `libroautor`
 --
 ALTER TABLE `libroautor`
   ADD PRIMARY KEY (`eIdLaut`),
   ADD KEY `fkeIdLibro` (`fkeIdLibro`,`fkeIdAutor`);
 
 --
--- Indices de la tabla `libros`
+-- Indexes for table `libros`
 --
 ALTER TABLE `libros`
   ADD PRIMARY KEY (`eIdLibro`);
 
 --
--- Indices de la tabla `sessions`
+-- Indexes for table `sessions`
 --
 ALTER TABLE `sessions`
   ADD PRIMARY KEY (`sessionId`),
   ADD KEY `fk_userId` (`fk_userId`);
 
 --
--- AUTO_INCREMENT de las tablas volcadas
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT de la tabla `catpersons`
+-- AUTO_INCREMENT for table `catpersons`
 --
 ALTER TABLE `catpersons`
-  MODIFY `personId` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `personId` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
--- AUTO_INCREMENT de la tabla `catusers`
+-- AUTO_INCREMENT for table `catusers`
 --
 ALTER TABLE `catusers`
-  MODIFY `userId` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `userId` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
--- AUTO_INCREMENT de la tabla `catusertypes`
+-- AUTO_INCREMENT for table `catusertypes`
 --
 ALTER TABLE `catusertypes`
   MODIFY `userTypeId` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
--- AUTO_INCREMENT de la tabla `sessions`
+-- AUTO_INCREMENT for table `sessions`
 --
 ALTER TABLE `sessions`
   MODIFY `sessionId` int NOT NULL AUTO_INCREMENT;
 
 --
--- Restricciones para tablas volcadas
+-- Constraints for dumped tables
 --
 
 --
--- Filtros para la tabla `catusers`
+-- Constraints for table `catusers`
 --
 ALTER TABLE `catusers`
   ADD CONSTRAINT `catusers_ibfk_1` FOREIGN KEY (`fk_personId`) REFERENCES `catpersons` (`personId`),
   ADD CONSTRAINT `catusers_ibfk_2` FOREIGN KEY (`fk_UserTypeId`) REFERENCES `catusertypes` (`userTypeId`);
 
 --
--- Filtros para la tabla `ejemplares`
+-- Constraints for table `ejemplares`
 --
 ALTER TABLE `ejemplares`
   ADD CONSTRAINT `ejemplares_ibfk_1` FOREIGN KEY (`fkeIdLibro`) REFERENCES `libros` (`eIdLibro`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `libroautor`
+-- Constraints for table `libroautor`
 --
 ALTER TABLE `libroautor`
   ADD CONSTRAINT `libroautor_ibfk_1` FOREIGN KEY (`fkeIdLibro`) REFERENCES `libros` (`eIdLibro`);
 
 --
--- Filtros para la tabla `sessions`
+-- Constraints for table `sessions`
 --
 ALTER TABLE `sessions`
   ADD CONSTRAINT `sessions_ibfk_1` FOREIGN KEY (`fk_userId`) REFERENCES `catusers` (`userId`);
