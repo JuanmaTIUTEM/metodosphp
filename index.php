@@ -154,56 +154,58 @@
 
 				<div class="shadow p-4 mb-4 bg-light" id="usersList">
 					<div class="container mt-3">
-					  <h2>Listado de Usuarios <hr> </h2>
-					             
-					  <table class="table table-dark table-hover">
-					    <thead>
-					      <tr>
-					        <th>#</th>
-					        <th>Código</th>
-					        <th>Nombre Completo</th>
-					        <th>Email</th>
-					        <th>Tipo Usuario</th>
-					        <th>Acciones</th>
-					      </tr>
-					    </thead>
-					    <tbody>
-					    	<?php 
-					    		foreach ($allUsers as $user){
-					    			//print_r($user);
-					    			//echo "<br>";?>
+					  	<h2>Listado de Usuarios <hr> </h2>
+					    <div class="table table-responsive">
+					    	<table class="table table-dark table-hover">
+					    	  <thead>
+					    	    <tr>
+					    	      <th>#</th>
+					    	      <th>Código</th>
+					    	      <th>Nombre Completo</th>
+					    	      <th>Email</th>
+					    	      <th>Tipo Usuario</th>
+					    	      <th>Acciones</th>
+					    	    </tr>
+					    	  </thead>
+					    	  <tbody>
+					    	  	<?php 
+					    	  		foreach ($allUsers as $user){
+					    	  			//print_r($user);
+					    	  			//echo "<br>";?>
 
-					    		<tr>
-					    		  <td data-bs-toggle="collapse" data-bs-target="#generalData"><?php echo $user[0]; ?>
-					    		  	<div id="generalData" class="collapse">
-					    		  		<ul>
-					    		  			<li>Nombre:</li>
-					    		  			<li>Apellidos:</li>
-					    		  			<li>Dirección:</li>
-					    		  			<li>Teléfono:</li>
-					    		  			<li>Email:</li>
-					    		  		</ul>
-					    		  	</div>
-					    		  </td>
-					    		  <td><?php echo $user[1]; ?></td>
-					    		  <td><?php echo $user[7]; ?></td>
-					    		  <td><?php echo $user[9]; ?></td>
-					    		  <td><?php echo $user[12]; ?></td>
-					    		  <td>
-					    		  	<button type="button" class="btn btn-outline-warning" onclick="editRow(<?php echo $user[0]; ?>);">Editar</button>
-					    		  	<form action="metodos.php" method="POST">
-					    		  		<button type="submit" class="btn btn-outline-danger" id="btnDesactivar" name="btnDesactivar" value="<?php echo $user[0]; ?>">Desactivar</button>
-					    		  	</form>
-					    		  	
-					    		  	<button type="button" class="btn btn-outline-primary" onclick="changeType(<?php echo $user[0]; ?>);">Cambiar Tipo Usuario</button>
-					    		  </td>
-					    		  
-					    		</tr>
-					    	
-					    	<?php }   	?>
-					      
-					    </tbody>
-					  </table>
+					    	  		<tr>
+					    	  		  <td data-bs-toggle="collapse" data-bs-target="#generalData"><?php echo $user[0]; ?>
+					    	  		  	<div id="generalData" class="collapse">
+					    	  		  		<ul>
+					    	  		  			<li>Nombre:</li>
+					    	  		  			<li>Apellidos:</li>
+					    	  		  			<li>Dirección:</li>
+					    	  		  			<li>Teléfono:</li>
+					    	  		  			<li>Email:</li>
+					    	  		  		</ul>
+					    	  		  	</div>
+					    	  		  </td>
+					    	  		  <td><?php echo $user[1]; ?></td>
+					    	  		  <td><?php echo $user[7]; ?></td>
+					    	  		  <td><?php echo $user[9]; ?></td>
+					    	  		  <td><?php echo $user[12]; ?></td>
+					    	  		  <td>
+					    	  		  	<button type="button" class="btn btn-outline-warning" onclick="editRow(<?php echo $user[0]; ?>);">Editar</button>
+					    	  		  	<form action="metodos.php" method="POST">
+					    	  		  		<button type="submit" class="btn btn-outline-danger" id="btnDesactivar" name="btnDesactivar" value="<?php echo $user[0]; ?>">Desactivar</button>
+					    	  		  	</form>
+					    	  		  	
+					    	  		  	<button type="button" class="btn btn-outline-primary" onclick="changeType(<?php echo $user[0]; ?>);">Cambiar Tipo Usuario</button>
+					    	  		  </td>
+					    	  		  
+					    	  		</tr>
+					    	  	
+					    	  	<?php }   	?>
+					    	    
+					    	  </tbody>
+					    	</table>
+					    </div>         
+					  
 					</div>
 
 				</div>
@@ -249,7 +251,25 @@
 			
 		}
 		function changeType(id){
-			alert(id);
+			let url = 'metodos.php?eIdUser='+ id;
+			let uName = document.getElementById('userName1');
+			let userId = document.getElementById('UserId');
+			let usrOldType = document.getElementById('usrOldType');
+			
+
+			axios.get(url)
+	        .then(function (response) {
+	            var data = response.data;
+	            console.log(data);
+	            uName.innerHTML = data.first_name + ' ' + data.last_name;
+	            userId.value = data.user_id;
+	            usrOldType.value = data.userType;
+	            $("#editType").modal("show");
+	        })
+	        .catch(function (error) {
+	            console.error(error);
+	        });
+
 		}
 
 		function fillUsersType(){
@@ -289,6 +309,43 @@
 	      <!-- Modal footer -->
 	      <div class="modal-footer">
 	        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+	      </div>
+
+	    </div>
+	  </div>
+	</div>
+
+
+	<div class="modal" id="editType">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+
+	      <!-- Modal Header -->
+	      <div class="modal-header">
+	        <h4 class="modal-title">Editar Tipo Usuario <label id="userName1"></label></h4>
+	        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+	      </div>
+
+	      <!-- Modal body -->
+	      <form action="metodosUpdate.php" method="POST">
+		      <div class="modal-body">
+		       	<input type="hidden" name="UserId" id="UserId">
+		       	<input type="text" id="usrOldType">
+		       	<select name="userTypeNw">
+		       		<option value="1">Tipo 1</option>
+		       		<option value="2">Tipo 2</option>
+		       		<option value="3">Tipo 3</option>
+		       		<option value="4">Tipo 4</option>
+		       	</select>
+		      </div>
+
+		      <!-- Modal footer -->
+		      <div class="modal-footer">
+		      	<button type="submit" class="btn btn-success" data-bs-dismiss="modal" name ="btnEdit" value="usrType">Guardar</button >
+	      </form>
+	        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+
+
 	      </div>
 
 	    </div>
